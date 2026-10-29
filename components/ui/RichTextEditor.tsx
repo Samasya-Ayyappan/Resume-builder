@@ -25,6 +25,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   className = '',
 }) => {
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit.configure({
         heading: false,
@@ -73,11 +74,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       )}
 
       <div
-        className={`rounded-lg border bg-white dark:bg-slate-900 transition-colors shadow-2xs overflow-hidden ${
-          error
-            ? 'border-rose-400 focus-within:border-rose-500 focus-within:ring-1 focus-within:ring-rose-200'
-            : 'border-slate-300 dark:border-slate-700 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-100 dark:focus-within:ring-indigo-900'
-        }`}
+        className={`rounded-lg border bg-white dark:bg-slate-900 transition-colors shadow-2xs overflow-hidden ${error
+          ? 'border-rose-400 focus-within:border-rose-500 focus-within:ring-1 focus-within:ring-rose-200'
+          : 'border-slate-300 dark:border-slate-700 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-100 dark:focus-within:ring-indigo-900'
+          }`}
       >
         {/* Compact Rich Text Toolbar */}
         <div className="flex flex-wrap items-center gap-1 p-1.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60">
@@ -85,11 +85,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             type="button"
             onClick={() => editor.chain().focus().toggleBold().run()}
             disabled={!editor.can().chain().focus().toggleBold().run()}
-            className={`p-1 rounded text-xs transition ${
-              editor.isActive('bold')
-                ? 'bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 font-bold'
-                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-            }`}
+            className={`p-1 rounded text-xs transition ${editor.isActive('bold')
+              ? 'bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 font-bold'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+              }`}
             title="Bold (Ctrl+B)"
             aria-label="Format Bold"
           >
@@ -100,11 +99,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             type="button"
             onClick={() => editor.chain().focus().toggleItalic().run()}
             disabled={!editor.can().chain().focus().toggleItalic().run()}
-            className={`p-1 rounded text-xs transition ${
-              editor.isActive('italic')
-                ? 'bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300'
-                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-            }`}
+            className={`p-1 rounded text-xs transition ${editor.isActive('italic')
+              ? 'bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+              }`}
             title="Italic (Ctrl+I)"
             aria-label="Format Italic"
           >
@@ -116,11 +114,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           <button
             type="button"
             onClick={() => editor.chain().focus().toggleBulletList().run()}
-            className={`p-1 rounded text-xs transition ${
-              editor.isActive('bulletList')
-                ? 'bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300'
-                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-            }`}
+            className={`p-1 rounded text-xs transition ${editor.isActive('bulletList')
+              ? 'bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+              }`}
             title="Bullet List"
             aria-label="Bullet List"
           >
@@ -130,11 +127,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           <button
             type="button"
             onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            className={`p-1 rounded text-xs transition ${
-              editor.isActive('orderedList')
-                ? 'bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300'
-                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-            }`}
+            className={`p-1 rounded text-xs transition ${editor.isActive('orderedList')
+              ? 'bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+              }`}
             title="Numbered List"
             aria-label="Numbered List"
           >

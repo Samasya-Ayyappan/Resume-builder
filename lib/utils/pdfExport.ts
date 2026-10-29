@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import html2canvas from 'html2canvas-pro';
 
 export interface PdfExportResult {
   success: boolean;
@@ -65,37 +65,25 @@ export async function exportResumeToPdf(
     // Allow browser one animation frame to compute clean layout
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-// -------------------------------------------------------------
-// ① Clean any literal `lab(` syntax that survived into the HTML.
-// This works even if the color is defined via a CSS variable
-// or an inline style that the browser already computed.
-// -------------------------------------------------------------
-const rawHtml = clone.outerHTML;
-const cleanedHtml = rawHtml.replace(/lab\([^)]*\)/gi, '');
 
-const cleanedContainer = document.createElement('div');
-cleanedContainer.innerHTML = cleanedHtml;
-if (!cleanedContainer.firstElementChild) {
-  throw new Error('Failed to generate a clean clone for PDF export.');
-}
-const cleanedClone = cleanedContainer.firstElementChild as HTMLElement;
-
-// -------------------------------------------------------------
-// ② Capture the cleaned clone with html2canvas
-// -------------------------------------------------------------
-const canvas = await html2canvas(cleanedClone, {
-  scale: 2,
-  useCORS: true,
-  logging: false,
-  backgroundColor: '#ffffff',
-  windowWidth: cleanedClone.scrollWidth || 794,
-});
+    // Capture the attached clone so its CSS styles remain available.
+    const canvas = await html2canvas(clone, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      backgroundColor: '#ffffff',
+      windowWidth: clone.scrollWidth || 794,
+      windowHeight: Math.max(
+        clone.scrollHeight,
+        clone.clientHeight,
+        1123
+      ),
+    });
 
     if (!canvas || canvas.width === 0 || canvas.height === 0) {
       throw new Error('Canvas render produced an empty image buffer.');
     }
 
-    // A4 dimensions in mm: 210 x 297 (aspect ratio ~ 1.4142857)
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
@@ -106,49 +94,67 @@ const canvas = await html2canvas(cleanedClone, {
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
 
-    // Calculate canvas height corresponding to one A4 page
-    const a4Ratio = pdfHeight / pdfWidth;
-    const pageCanvasHeight = Math.floor(canvas.width * a4Ratio);
+    // Canvas pixels that correspond to one A4 page.
+    const pageCanvasHeight = Math.floor(
+      canvas.width * (pdfHeight / pdfWidth)
+    );
 
-    // Calculate number of pages required
-    const totalPages = Math.max(1, Math.ceil(canvas.height / pageCanvasHeight));
+    const totalPages = Math.max(
+      1,
+      Math.ceil(canvas.height / pageCanvasHeight)
+    );
 
-    // Slice canvas into separate A4 page slices to prevent distortion and clipping
     for (let pageIdx = 0; pageIdx < totalPages; pageIdx++) {
       if (pageIdx > 0) {
         pdf.addPage('a4', 'portrait');
       }
 
+      const sourceY = pageIdx * pageCanvasHeight;
+      const sourceHeight = Math.min(
+        pageCanvasHeight,
+        canvas.height - sourceY
+      );
+
       const sliceCanvas = document.createElement('canvas');
       sliceCanvas.width = canvas.width;
-      sliceCanvas.height = pageCanvasHeight;
+      sliceCanvas.height = sourceHeight;
 
       const sliceCtx = sliceCanvas.getContext('2d');
-      if (sliceCtx) {
-        // Fill page background with pure white
-        sliceCtx.fillStyle = '#ffffff';
-        sliceCtx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
 
-        const sourceY = pageIdx * pageCanvasHeight;
-        const sourceHeight = Math.min(pageCanvasHeight, canvas.height - sourceY);
-
-        if (sourceHeight > 0) {
-          sliceCtx.drawImage(
-            canvas,
-            0,
-            sourceY,
-            canvas.width,
-            sourceHeight,
-            0,
-            0,
-            canvas.width,
-            sourceHeight
-          );
-        }
-
-        const pageImgData = sliceCanvas.toDataURL('image/png', 0.95);
-        pdf.addImage(pageImgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+      if (!sliceCtx) {
+        throw new Error('Could not create a canvas context for PDF export.');
       }
+
+      sliceCtx.fillStyle = '#ffffff';
+      sliceCtx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+
+      sliceCtx.drawImage(
+        canvas,
+        0,
+        sourceY,
+        canvas.width,
+        sourceHeight,
+        0,
+        0,
+        canvas.width,
+        sourceHeight
+      );
+
+      const pageImgData = sliceCanvas.toDataURL('image/png');
+
+      // Keep the same scale on the final partial page to avoid distortion.
+      const renderedHeight = sourceHeight * (pdfWidth / canvas.width);
+
+      pdf.addImage(
+        pageImgData,
+        'PNG',
+        0,
+        0,
+        pdfWidth,
+        renderedHeight,
+        undefined,
+        'FAST'
+      );
     }
 
     // Construct sanitized file name
