@@ -81,12 +81,9 @@ export const FRESHER_SAMPLE_DATA: ResumeData = {
       startDate: '2025-06',
       endDate: '2025-08',
       isCurrent: false,
-      description: 'Built customer-facing microservices and automated reporting pipelines.',
-      highlights: [
-        'Developed <strong>RESTful API endpoints</strong> in TypeScript & Node.js, reducing query response times by <strong>28%</strong>.',
-        'Implemented end-to-end integration tests using <strong>Vitest</strong>, boosting code coverage from 64% to <strong>88%</strong>.',
-        'Collaborated with a 5-member Agile squad on bi-weekly sprint cycles and CI/CD deployment pipelines.',
-      ],
+      description:
+        '<p>Built customer-facing microservices and automated reporting pipelines.</p><ul><li>Developed <strong>RESTful API endpoints</strong> in TypeScript &amp; Node.js, reducing query response times by <strong>28%</strong>.</li><li>Implemented end-to-end integration tests using <strong>Vitest</strong>, boosting code coverage from 64% to <strong>88%</strong>.</li><li>Collaborated with a 5-member Agile squad on bi-weekly sprint cycles and CI/CD deployment pipelines.</li></ul>',
+      highlights: [],
     },
   ],
   education: [
@@ -216,12 +213,9 @@ export const EXPERIENCED_SAMPLE_DATA: ResumeData = {
       startDate: '2023-01',
       endDate: 'Present',
       isCurrent: true,
-      description: 'Lead engineer for the Core Billing and Developer Portal team serving 1.2M+ active merchant businesses.',
-      highlights: [
-        'Architected a distributed event-driven billing reconciliation service in Node.js and <strong>Kafka</strong>, processing <strong>$45M+ in monthly transactions</strong> with 99.99% reliability.',
-        'Spearheaded frontend migration of merchant dashboard to <strong>Next.js App Router</strong>, cutting First Contentful Paint by <strong>44%</strong> and boosting SEO rankings.',
-        'Mentored 6 junior and mid-level engineers through technical design reviews, pair programming, and career progression frameworks.',
-      ],
+      description:
+        '<p>Lead engineer for the Core Billing and Developer Portal team serving 1.2M+ active merchant businesses.</p><ul><li>Architected a distributed event-driven billing reconciliation service in Node.js and <strong>Kafka</strong>, processing <strong>$45M+ in monthly transactions</strong> with 99.99% reliability.</li><li>Spearheaded frontend migration of merchant dashboard to <strong>Next.js App Router</strong>, cutting First Contentful Paint by <strong>44%</strong> and boosting SEO rankings.</li><li>Mentored 6 junior and mid-level engineers through technical design reviews, pair programming, and career progression frameworks.</li></ul>',
+      highlights: [],
     },
     {
       id: 'exp-exp-2',
@@ -231,12 +225,9 @@ export const EXPERIENCED_SAMPLE_DATA: ResumeData = {
       startDate: '2020-08',
       endDate: '2022-12',
       isCurrent: false,
-      description: 'Built high-throughput API gateways and internal developer tools.',
-      highlights: [
-        'Designed and deployed scalable <strong>GraphQL microservices</strong> handling 85,000 requests/sec with Redis caching layer.',
-        'Reduced AWS infrastructure monthly spending by <strong>$32,000</strong> through database index tuning and Lambda concurrency right-sizing.',
-        'Implemented rigorous CI/CD GitHub Actions pipelines with automated canary releases, decreasing release rollback rate to < 1%.',
-      ],
+      description:
+        '<p>Built high-throughput API gateways and internal developer tools.</p><ul><li>Designed and deployed scalable <strong>GraphQL microservices</strong> handling 85,000 requests/sec with Redis caching layer.</li><li>Reduced AWS infrastructure monthly spending by <strong>$32,000</strong> through database index tuning and Lambda concurrency right-sizing.</li><li>Implemented rigorous CI/CD GitHub Actions pipelines with automated canary releases, decreasing release rollback rate to &lt; 1%.</li></ul>',
+      highlights: [],
     },
     {
       id: 'exp-exp-3',
@@ -246,11 +237,9 @@ export const EXPERIENCED_SAMPLE_DATA: ResumeData = {
       startDate: '2018-06',
       endDate: '2020-07',
       isCurrent: false,
-      description: 'Frontend and full-stack feature development for SaaS enterprise portal.',
-      highlights: [
-        'Constructed reusable React component library with <strong>WCAG 2.1 AA accessibility</strong> compliance used by 5 product teams.',
-        'Refactored legacy monolith endpoints into modular REST APIs, improving overall system maintainability.',
-      ],
+      description:
+        '<p>Frontend and full-stack feature development for SaaS enterprise portal.</p><ul><li>Constructed reusable React component library with <strong>WCAG 2.1 AA accessibility</strong> compliance used by 5 product teams.</li><li>Refactored legacy monolith endpoints into modular REST APIs, improving overall system maintainability.</li></ul>',
+      highlights: [],
     },
   ],
   education: [

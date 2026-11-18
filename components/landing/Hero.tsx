@@ -4,7 +4,7 @@ import { CheckCircle2, Sparkles, ArrowRight, ShieldCheck, Zap } from 'lucide-rea
 
 export const Hero: React.FC = () => {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 pt-16 pb-20 sm:pt-24 sm:pb-28 transition-colors">
+    <section className="relative overflow-hidden bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 pt-16 pb-20 sm:pb-28 transition-colors">
       {/* Decorative background glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-tr from-indigo-100/40 to-sky-100/30 dark:from-indigo-950/20 dark:to-red-950/20 blur-3xl -z-10 pointer-events-none" />
 

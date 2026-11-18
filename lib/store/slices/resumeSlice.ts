@@ -81,7 +81,7 @@ export const resumeSlice = createSlice({
         endDate: '',
         isCurrent: false,
         description: '',
-        highlights: [''],
+        highlights: [],
         ...(action.payload || {}),
       };
       state.experience.push(newItem);

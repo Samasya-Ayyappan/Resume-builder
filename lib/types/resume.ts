@@ -57,7 +57,7 @@ export interface ExperienceItem {
   endDate: string; // YYYY-MM or 'Present' or legacy formatted string
   isCurrent: boolean;
   description: string; // Rich-text HTML or plain text
-  highlights: string[]; // Rich-text HTML bullet points or plain text
+  highlights?: string[]; // Legacy rich-text bullet points (optional)
 }
 
 export interface EducationItem {

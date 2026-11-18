@@ -1,3 +1,4 @@
+
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas-pro';
 
@@ -8,10 +9,6 @@ export interface PdfExportResult {
   error?: string;
 }
 
-/**
- * Exports the specified HTML resume element as a crisp, multi-page vector-quality A4 PDF.
- * Uses an offscreen clone to isolate from zoom transforms, parent flex/hidden states, and responsive media rules.
- */
 export async function exportResumeToPdf(
   element: HTMLElement,
   fileName: string = 'Resume.pdf'
@@ -20,70 +17,107 @@ export async function exportResumeToPdf(
 
   try {
     if (typeof window === 'undefined') {
-      return { success: false, error: 'PDF export is only available in browser environments.' };
+      return {
+        success: false,
+        error: 'PDF export is only available in browser environments.',
+      };
     }
 
     if (!element) {
-      return { success: false, error: 'Resume preview document element not found.' };
+      return {
+        success: false,
+        error: 'Resume preview document element not found.',
+      };
     }
 
-    // Wait for custom web fonts (Geist, serif, etc.) to complete layout rasterization
-    if (document.fonts && document.fonts.ready) {
-      try {
-        await document.fonts.ready;
-      } catch (fontErr) {
-        console.warn('[PDF Export] Font ready promise rejected:', fontErr);
-      }
+    // Wait for fonts before capturing.
+    if (document.fonts?.ready) {
+      await document.fonts.ready;
     }
 
-    // Create an isolated offscreen container with exact A4 proportions (210mm) and unscaled CSS
+    // Create isolated A4 container.
     offscreenContainer = document.createElement('div');
-    offscreenContainer.style.position = 'fixed';
-    offscreenContainer.style.left = '-10000px';
-    offscreenContainer.style.top = '0';
-    offscreenContainer.style.width = '210mm';
-    offscreenContainer.style.backgroundColor = '#ffffff';
-    offscreenContainer.style.zIndex = '-99999';
-    offscreenContainer.style.overflow = 'visible';
-    offscreenContainer.style.opacity = '1';
-    offscreenContainer.style.pointerEvents = 'none';
 
-    // Deep clone the resume template markup
+    Object.assign(offscreenContainer.style, {
+      position: 'fixed',
+      left: '-10000px',
+      top: '0',
+      width: '210mm',
+      backgroundColor: '#ffffff',
+      zIndex: '-99999',
+      overflow: 'visible',
+      pointerEvents: 'none',
+    });
+
+    // Clone the resume.
     const clone = element.cloneNode(true) as HTMLElement;
-    clone.style.transform = 'none';
-    clone.style.width = '210mm';
-    clone.style.minHeight = '297mm';
-    clone.style.margin = '0';
-    clone.style.boxShadow = 'none';
-    clone.style.border = 'none';
-    clone.style.backgroundColor = '#ffffff';
-    clone.style.overflow = 'visible';
+
+    const templateRoot = clone.querySelector<HTMLElement>(
+      '.resume-template-root'
+    );
+
+    if (templateRoot) {
+      // Keep horizontal margins but remove the one-time vertical padding.
+      // Vertical margins will be applied separately to every PDF page.
+      templateRoot.style.padding = '0 10mm';
+    }
+
+    Object.assign(clone.style, {
+      transform: 'none',
+      width: '210mm',
+      minHeight: '0',
+      height: 'auto',
+      margin: '0',
+      boxShadow: 'none',
+      border: 'none',
+      backgroundColor: '#ffffff',
+      color: '#0f172a',
+      overflow: 'visible',
+      boxSizing: 'border-box',
+    });
 
     offscreenContainer.appendChild(clone);
     document.body.appendChild(offscreenContainer);
 
-    // Allow browser one animation frame to compute clean layout
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    // Allow layout to settle.
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => resolve());
+    });
 
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 100);
+    });
 
-    // Capture the attached clone so its CSS styles remain available.
+    // Get actual content dimensions.
+    const contentWidth = Math.ceil(
+      clone.getBoundingClientRect().width
+    );
+
+    const contentHeight = Math.ceil(
+      Math.max(clone.scrollHeight, clone.offsetHeight)
+    );
+
+    if (contentWidth === 0 || contentHeight === 0) {
+      throw new Error('Resume content has invalid dimensions.');
+    }
+
+    // Capture actual content without forcing an extra A4 page.
     const canvas = await html2canvas(clone, {
       scale: 2,
       useCORS: true,
       logging: false,
       backgroundColor: '#ffffff',
-      windowWidth: clone.scrollWidth || 794,
-      windowHeight: Math.max(
-        clone.scrollHeight,
-        clone.clientHeight,
-        1123
-      ),
+      width: contentWidth,
+      height: contentHeight,
+      windowWidth: contentWidth,
+      windowHeight: contentHeight,
     });
 
     if (!canvas || canvas.width === 0 || canvas.height === 0) {
-      throw new Error('Canvas render produced an empty image buffer.');
+      throw new Error('Canvas render produced an empty image.');
     }
 
+    // Initialize A4 PDF.
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
@@ -94,41 +128,100 @@ export async function exportResumeToPdf(
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
 
-    // Canvas pixels that correspond to one A4 page.
+    const PAGE_MARGIN_MM = 10;
+    const CONTENT_HEIGHT_MM = pdfHeight - PAGE_MARGIN_MM * 2;
+
     const pageCanvasHeight = Math.floor(
-      canvas.width * (pdfHeight / pdfWidth)
+      canvas.width * (CONTENT_HEIGHT_MM / pdfWidth)
     );
 
-    const totalPages = Math.max(
-      1,
-      Math.ceil(canvas.height / pageCanvasHeight)
-    );
+    // Calculate safe section boundaries.
+    const cloneRect = clone.getBoundingClientRect();
 
-    for (let pageIdx = 0; pageIdx < totalPages; pageIdx++) {
-      if (pageIdx > 0) {
+    const scaleFactor =
+      canvas.width / cloneRect.width;
+
+    const safeBreaks = Array.from(
+      clone.querySelectorAll<HTMLElement>(
+        '.break-inside-avoid'
+      )
+    )
+      .map((node) => {
+        const rect = node.getBoundingClientRect();
+
+        return Math.round(
+          (rect.bottom - cloneRect.top) * scaleFactor
+        );
+      })
+      .filter(
+        (position) =>
+          position > 0 && position < canvas.height
+      )
+      .sort((a, b) => a - b);
+
+    // Pagination.
+    let sourceY = 0;
+    let totalPages = 0;
+
+    // Ignore insignificant canvas rounding remnants.
+    const pixelTolerance = 2;
+
+    while (sourceY < canvas.height - pixelTolerance) {
+      const targetY = Math.min(
+        sourceY + pageCanvasHeight,
+        canvas.height
+      );
+
+      let nextY = targetY;
+
+      // Only adjust breaks when another page is needed.
+      if (targetY < canvas.height - pixelTolerance) {
+        const minUsefulHeight =
+          pageCanvasHeight * 0.75;
+
+        const candidates = safeBreaks.filter(
+          (position) =>
+            position > sourceY + minUsefulHeight &&
+            position <= targetY
+        );
+
+        if (candidates.length > 0) {
+          nextY = candidates[candidates.length - 1];
+        }
+      }
+
+      if (nextY <= sourceY) {
+        throw new Error('Invalid PDF page boundary.');
+      }
+
+      const sourceHeight = nextY - sourceY;
+
+      // Add a new page only when actual content remains.
+      if (totalPages > 0) {
         pdf.addPage('a4', 'portrait');
       }
 
-      const sourceY = pageIdx * pageCanvasHeight;
-      const sourceHeight = Math.min(
-        pageCanvasHeight,
-        canvas.height - sourceY
-      );
-
       const sliceCanvas = document.createElement('canvas');
+
       sliceCanvas.width = canvas.width;
       sliceCanvas.height = sourceHeight;
 
-      const sliceCtx = sliceCanvas.getContext('2d');
+      const ctx = sliceCanvas.getContext('2d');
 
-      if (!sliceCtx) {
-        throw new Error('Could not create a canvas context for PDF export.');
+      if (!ctx) {
+        throw new Error('Could not create canvas context.');
       }
 
-      sliceCtx.fillStyle = '#ffffff';
-      sliceCtx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+      ctx.fillStyle = '#ffffff';
 
-      sliceCtx.drawImage(
+      ctx.fillRect(
+        0,
+        0,
+        sliceCanvas.width,
+        sliceCanvas.height
+      );
+
+      ctx.drawImage(
         canvas,
         0,
         sourceY,
@@ -140,34 +233,45 @@ export async function exportResumeToPdf(
         sourceHeight
       );
 
-      const pageImgData = sliceCanvas.toDataURL('image/png');
+      const imageData = sliceCanvas.toDataURL('image/png');
 
-      // Keep the same scale on the final partial page to avoid distortion.
-      const renderedHeight = sourceHeight * (pdfWidth / canvas.width);
+      // Preserve identical width and image scale on every page.
+      const renderedHeight =
+        sourceHeight * (pdfWidth / canvas.width);
 
       pdf.addImage(
-        pageImgData,
+        imageData,
         'PNG',
         0,
-        0,
+        PAGE_MARGIN_MM,
         pdfWidth,
-        renderedHeight,
+        Math.min(renderedHeight, CONTENT_HEIGHT_MM),
         undefined,
         'FAST'
       );
+
+      sourceY = nextY;
+      totalPages++;
     }
 
-    // Construct sanitized file name
-    const cleanFileName = fileName.endsWith('.pdf') ? fileName : `${fileName}.pdf`;
+    if (totalPages === 0) {
+      throw new Error('No PDF pages were generated.');
+    }
 
-    // Trigger download using Blob + object URL for maximum cross-browser reliability
+    // Download PDF.
+    const cleanFileName = fileName.endsWith('.pdf')
+      ? fileName
+      : `${fileName}.pdf`;
+
     const pdfBlob = pdf.output('blob');
     const blobUrl = URL.createObjectURL(pdfBlob);
 
     const downloadLink = document.createElement('a');
+
     downloadLink.href = blobUrl;
     downloadLink.download = cleanFileName;
     downloadLink.style.display = 'none';
+
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
@@ -176,21 +280,39 @@ export async function exportResumeToPdf(
       URL.revokeObjectURL(blobUrl);
     }, 2000);
 
-    return { success: true, fileName: cleanFileName, totalPages };
+    return {
+      success: true,
+      fileName: cleanFileName,
+      totalPages,
+    };
+
   } catch (error) {
-    const errorMsg = error instanceof Error ? error.message : 'Unknown PDF generation error';
-    console.error('[Resume Studio] Error generating PDF:', error);
-    return { success: false, error: errorMsg };
+    const errorMsg =
+      error instanceof Error
+        ? error.message
+        : 'Unknown PDF generation error';
+
+    console.error(
+      '[Resume Studio] Error generating PDF:',
+      error
+    );
+
+    return {
+      success: false,
+      error: errorMsg,
+    };
+
   } finally {
-    // Always cleanup offscreen container
-    if (offscreenContainer && offscreenContainer.parentNode) {
-      offscreenContainer.parentNode.removeChild(offscreenContainer);
+    if (offscreenContainer?.parentNode) {
+      offscreenContainer.parentNode.removeChild(
+        offscreenContainer
+      );
     }
   }
 }
 
 /**
- * Triggers the browser's native print dialog with print-optimized CSS
+ * Native browser printing.
  */
 export function triggerNativePrint(): void {
   if (typeof window !== 'undefined') {

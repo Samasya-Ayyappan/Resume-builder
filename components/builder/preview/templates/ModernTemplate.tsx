@@ -29,7 +29,7 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ data }) => {
   };
 
   return (
-    <div className="w-full h-full bg-white text-slate-800 p-8 sm:p-10 font-sans leading-relaxed text-[13px]">
+    <div className="resume-template-root w-full h-full bg-white text-slate-800 p-8 sm:p-10 font-sans leading-relaxed text-[13px]">
       {/* Header */}
       <header className="border-b pb-5 mb-5" style={{ borderColor: theme.border }}>
         <h1 className="text-3xl font-extrabold tracking-tight text-slate-900" style={{ color: theme.text }}>
@@ -78,7 +78,7 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ data }) => {
 
       {/* Professional Summary */}
       {summary && (
-        <section className="mb-5 break-inside-avoid">
+        <section className="mb-5">
           <h2
             className="text-xs font-bold uppercase tracking-wider mb-1.5 pb-0.5 border-b"
             style={{ color: theme.primary, borderColor: theme.border }}
@@ -221,7 +221,7 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ data }) => {
 
       {/* Skills Categories */}
       {skills.length > 0 && skills.some((c) => c.skills.length > 0) && (
-        <section className="mb-5 break-inside-avoid">
+        <section className="mb-5">
           <h2
             className="text-xs font-bold uppercase tracking-wider mb-2 pb-0.5 border-b"
             style={{ color: theme.primary, borderColor: theme.border }}
@@ -232,7 +232,7 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ data }) => {
             {skills
               .filter((c) => c.skills.length > 0)
               .map((cat) => (
-                <div key={cat.id} className="text-xs">
+                <div key={cat.id} className="text-xs break-inside-avoid">
                   <span className="font-bold text-slate-800">{cat.name}: </span>
                   <span className="text-slate-700">{cat.skills.join(' • ')}</span>
                 </div>
@@ -244,7 +244,7 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ data }) => {
       {/* Certifications & Languages side-by-side or stacked */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {activeSections.certifications && certifications.length > 0 && (
-          <section className="break-inside-avoid">
+          <section>
             <h2
               className="text-xs font-bold uppercase tracking-wider mb-1.5 pb-0.5 border-b"
               style={{ color: theme.primary, borderColor: theme.border }}
@@ -255,7 +255,7 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ data }) => {
               {certifications.map((c) => {
                 const dt = formatDisplayDate(c.issueDate);
                 return (
-                  <div key={c.id} className="text-xs">
+                  <div key={c.id} className="text-xs break-inside-avoid">
                     <div className="font-bold text-slate-800">{c.name}</div>
                     <div className="text-slate-500">
                       {c.issuer} {dt ? `(${dt})` : ''}
@@ -268,7 +268,7 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ data }) => {
         )}
 
         {activeSections.languages && languages.length > 0 && (
-          <section className="break-inside-avoid">
+          <section>
             <h2
               className="text-xs font-bold uppercase tracking-wider mb-1.5 pb-0.5 border-b"
               style={{ color: theme.primary, borderColor: theme.border }}
@@ -277,7 +277,7 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ data }) => {
             </h2>
             <div className="flex flex-wrap gap-2 text-xs">
               {languages.map((l) => (
-                <div key={l.id} className="text-slate-700">
+                <div key={l.id} className="text-slate-700 break-inside-avoid">
                   <span className="font-semibold">{l.language}</span>{' '}
                   <span className="text-slate-500">({l.proficiency})</span>
                 </div>
@@ -289,7 +289,7 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ data }) => {
 
       {/* Achievements / Honors */}
       {activeSections.achievements && achievements.length > 0 && (
-        <section className="mt-4 break-inside-avoid">
+        <section className="mt-4">
           <h2
             className="text-xs font-bold uppercase tracking-wider mb-1.5 pb-0.5 border-b"
             style={{ color: theme.primary, borderColor: theme.border }}
@@ -298,7 +298,7 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ data }) => {
           </h2>
           <div className="space-y-1.5">
             {achievements.map((a) => (
-              <div key={a.id} className="text-xs">
+              <div key={a.id} className="text-xs break-inside-avoid">
                 <div className="font-semibold text-slate-800">
                   {a.title} {a.date && <span className="font-normal text-slate-500">({formatDisplayDate(a.date)})</span>}
                 </div>

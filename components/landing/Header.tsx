@@ -5,7 +5,7 @@ import { ThemeToggle } from '../ui/ThemeToggle';
 export const Header: React.FC = () => {
   return (
     <header className="sticky top-0 z-40 w-full bg-white/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 lg:h-16 h-28 flex flex-col lg:flex-row items-center justify-between gap-2 my-4 lg:my-2">
         {/* Brand */}
         <Link href="/" className="flex items-center gap-2.5">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white flex items-center justify-center font-black text-sm shadow-2xs">
@@ -15,7 +15,7 @@ export const Header: React.FC = () => {
             <span className="font-extrabold text-lg tracking-tight text-slate-900 dark:text-slate-100 block leading-tight">
               Resume Studio
             </span>
-            <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 block tracking-wider uppercase -mt-0.5">
+            <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 block tracking-wider uppercase -mt-0.1">
               Production Next.js
             </span>
           </div>

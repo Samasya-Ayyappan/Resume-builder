@@ -149,11 +149,10 @@ export const BuilderToolbar: React.FC<BuilderToolbarProps> = ({ documentRef }) =
                     type="button"
                     onClick={() => dispatch(setThemeColor(cKey))}
                     title={`Accent: ${config.label}`}
-                    className={`w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full transition-transform ${
-                      isSelected
+                    className={`w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full transition-transform ${isSelected
                         ? 'ring-2 ring-offset-2 ring-indigo-500 dark:ring-offset-slate-900 scale-110'
                         : 'hover:scale-105 opacity-80 hover:opacity-100'
-                    }`}
+                      }`}
                     style={{ backgroundColor: config.primary }}
                     aria-label={`Select ${config.label} accent`}
                   />
