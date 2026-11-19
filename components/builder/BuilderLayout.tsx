@@ -13,8 +13,10 @@ import { ExperienceForm } from './editor/ExperienceForm';
 import { EducationForm } from './editor/EducationForm';
 import { SkillsForm } from './editor/SkillsForm';
 import { ProjectsForm } from './editor/ProjectsForm';
+import { AchievementsForm } from './editor/AchievementsForm';
 import { CertificationsForm } from './editor/CertificationsForm';
-import { AdditionalSectionsForm } from './editor/AdditionalSectionsForm';
+import { LanguagesForm } from './editor/LanguagesForm';
+import { SectionTogglesForm } from './editor/SectionTogglesForm';
 import { SectionTitleEditor } from './editor/SectionTitleEditor';
 import {
   User,
@@ -23,8 +25,10 @@ import {
   GraduationCap,
   Wrench,
   FolderGit2,
+  Trophy,
   Award,
-  Settings,
+  Languages,
+  SlidersHorizontal,
   ChevronDown,
   ChevronUp,
   FileText,
@@ -47,8 +51,10 @@ export const BuilderLayout: React.FC = () => {
     education: true,
     skills: true,
     projects: resume.metadata.resumeType === 'fresher',
+    achievements: false,
     certifications: false,
-    additional: false,
+    languages: false,
+    displayToggles: false,
   });
 
   const toggleSectionAccordion = (key: string) => {
@@ -111,6 +117,14 @@ export const BuilderLayout: React.FC = () => {
       badge: resume.projects.length > 0 ? `${resume.projects.length} projects` : undefined,
     },
     {
+      id: 'achievements',
+      sectionKey: 'achievements',
+      defaultTitle: 'Honors & Achievements',
+      icon: <Trophy className="w-4 h-4 text-amber-500" />,
+      component: <AchievementsForm />,
+      badge: resume.achievements.length > 0 ? `${resume.achievements.length} entries` : undefined,
+    },
+    {
       id: 'certifications',
       sectionKey: 'certifications',
       defaultTitle: 'Certifications',
@@ -119,11 +133,18 @@ export const BuilderLayout: React.FC = () => {
       badge: resume.certifications.length > 0 ? `${resume.certifications.length}` : undefined,
     },
     {
-      id: 'additional',
+      id: 'languages',
       sectionKey: 'languages',
-      defaultTitle: 'Languages & Section Toggles',
-      icon: <Settings className="w-4 h-4 text-slate-600 dark:text-slate-400" />,
-      component: <AdditionalSectionsForm />,
+      defaultTitle: 'Languages',
+      icon: <Languages className="w-4 h-4 text-sky-600 dark:text-sky-400" />,
+      component: <LanguagesForm />,
+      badge: resume.languages.length > 0 ? `${resume.languages.length} languages` : undefined,
+    },
+    {
+      id: 'displayToggles',
+      defaultTitle: 'Section Display Toggles',
+      icon: <SlidersHorizontal className="w-4 h-4 text-slate-600 dark:text-slate-400" />,
+      component: <SectionTogglesForm />,
     },
   ];
 
@@ -204,6 +225,11 @@ export const BuilderLayout: React.FC = () => {
                       {sec.badge && (
                         <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 ml-1">
                           {sec.badge}
+                        </span>
+                      )}
+                      {sec.id in resume.activeSections && !resume.activeSections[sec.id as keyof typeof resume.activeSections] && (
+                        <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 line-through ml-1">
+                          Hidden on Resume
                         </span>
                       )}
                     </div>

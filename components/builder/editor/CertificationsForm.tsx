@@ -39,9 +39,9 @@ export const CertificationsForm: React.FC = () => {
           {certifications.map((cert, index) => (
             <div
               key={cert.id}
-              className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-2xs space-y-3 relative"
+              className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs space-y-3 relative"
             >
-              <div className="flex items-center justify-between border-b border-slate-700 pb-2.5">
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
                 <span className="text-xs font-bold uppercase text-slate-500 tracking-wider">
                   Certification #{index + 1}: {cert.name || 'New Credential'}
                 </span>
